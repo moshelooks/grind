@@ -69,8 +69,8 @@ starting from the current working directory to find the root of a git repository
 
 There is only one group in this example, but groups may be nested arbitrarily inside of
 other groups; `grind arg1 arg2 arg3 ... argN` walks down the directory tree from
-`REPO_ROOT_DIR/commands/` until it reaches an executable file `arg1/.../argM` where $M
-\\leq N$ which gets run with `argM+1 argM+2 ... argN` as its arguments.
+`REPO_ROOT_DIR/commands/` until it reaches an executable file `arg1/.../argM`
+(${M}\\leq{N}$) which gets run with `argM+1 argM+2 ... argN` as its arguments.
 
 ## Using Grind in Your Project
 
