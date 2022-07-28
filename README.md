@@ -117,7 +117,7 @@ that the docstring can contain arbitrary control characters.
 > executable, where `cmd` is the name of the executable. You can also do this when your
 > executable _is_ a bash script, in lieu of utilizing the `docstring` function.
 
-### Customization
+## Customization
 
 This is the fun part! If a `.grind.bash` file is found in the root of your repository,
 `grind` will `source` it prior to command execution. The most obvious things to put in
