@@ -10,6 +10,7 @@ This approach has a number of advantages:
 - Commands are easily discoverable, because they are all in one place.
 - Commands can run even when the main system is broken in various ways e.g. in the
   course of bootstrapping and upgrades.
+- Commands can easily dispatch to other commands in a predictable environment.
 - Commands are unlikely to be accidentally shipped to production.
 - Commands run quickly, because they are self-contained. If `grind` were e.g. a
   monolithic Python application, it would need to import the dependencies of all of its
