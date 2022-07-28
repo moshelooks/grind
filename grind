@@ -118,9 +118,9 @@ _grind_describe_files() {
 _grind_group_help() {
     local group_path="$1"
     local group_title="$2"
+    cd "$group_path"
     (
         set -eu -o pipefail
-        cd "$group_path"
         cat
         echo -e "# $group_title\n"
 
