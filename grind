@@ -57,6 +57,13 @@ export REPO_ROOT_DIR
 GRIND="$(realpath "${BASH_SOURCE[0]}")"
 export GRIND
 
+# Use <https://github.com/charmbracelet/glow> for markdown if available.
+if command -v glow &>/dev/null; then
+    export MARKDOWN_READER="glow -w 93"
+else
+    export MARKDOWN_READER="cat"
+fi
+
 function docstring() {
     if [[ -v _GRIND_SHOW_DOCS_AND_EXIT ]]; then
         $MARKDOWN_READER -
@@ -72,20 +79,19 @@ function bad_args() {
 }
 export -f bad_args
 
-# Load per-repo customizations.
+# Load project-level customizations.
 if [ -e "${REPO_ROOT_DIR}/.grind.bash" ]; then
     # shellcheck disable=SC1091
     source "${REPO_ROOT_DIR}/.grind.bash"
 fi
 
-# This goes _after_ per-repo customization so that the defaults can be overridden
-# without clobbering the user's preference if they set this in their environment.
-if [ ! -v MARKDOWN_READER ]; then
-    if command -v glow &>/dev/null; then
-        export MARKDOWN_READER="glow ${GLOW_ARGS:--w 93}"
-    else
-        export MARKDOWN_READER="cat"
-    fi
+# Load user-level customizations.
+if [ -e "${REPO_ROOT_DIR}/.grind.local.bash" ]; then
+    # shellcheck disable=SC1091
+    source "${REPO_ROOT_DIR}/.grind.local.bash"
+elif [ -e "${XDG_CONFIG_HOME:-$HOME/.config}/grind.bash" ]; then
+    # shellcheck disable=SC1091
+    source "${XDG_CONFIG_HOME:-$HOME/.config}/grind.bash"
 fi
 
 _grind_describe_files() {

@@ -62,7 +62,7 @@ grind examples hello_world
 
 When `grind examples hello_world` is executed, `grind` goes up the directory tree
 starting from the current working directory to find the root of a git repository
-(`REPO_ROOT_DIR`), then runs `REPO_ROOT_DIR/commands/examples/hello_world`.
+(`REPO_ROOT_DIR`), then runs `${REPO_ROOT_DIR}/commands/examples/hello_world`.
 
 - `examples` is the *group* corresponding to the directory [`commands/examples/`].
 - `hello_world` is the *command* corresponding the script
@@ -70,7 +70,7 @@ starting from the current working directory to find the root of a git repository
 
 There is only one group in this example, but groups may be nested arbitrarily inside of
 other groups; `grind arg1 arg2 arg3 ... argN` walks down the directory tree from
-`REPO_ROOT_DIR/commands/` until it reaches an executable file `arg1/.../argM`
+`${REPO_ROOT_DIR}/commands/` until it reaches an executable file `arg1/.../argM`
 (${M}\\leq{N}$) which gets run with `argM+1 argM+2 ... argN` as its arguments.
 
 ## Using Grind in Your Project
@@ -161,14 +161,22 @@ This makes use of a number of functions defined in `grind`'s own
 Yes, `grind` is itself a project that uses `grind` to manage it's own meager repertoire
 of scripts; so meta!
 
-> :information_source: The `MARKDOWN_READER` environment variable is only set if it is
-> undefined after sourcing `.grind.bash`. This means that you may set it to the command
-> of your liking on a per-project basis, or as a personal customization by setting it as
-> an environment variable in your `.bashrc` or similar. If you want to stick with [glow]
-> for reading markdown but customize its output, use `GLOW_ARGS`; e.g. say
-> `GLOW_ARGS="-w 80"` for narrower output.
+The use-case for `.grind.bash` is project-level customization. You can also add
+user-level customizations to `${REPO_ROOT_DIR}/.grind.local.bash` [^2]. If user-level
+customizations are found, they will be _additionally_ applied after the project-level
+customizations. For example you can say `MARKDOWN_READER="glow -w 80" if you prefer
+narrower output, or swap out glow for some other markdown renderer.
+
+> :information_source: Add `/.grind.local.bash` to you `.gitignore` so this guy doesn't
+> get checked in to your repo by accident.
+
+---
 
 [^1]: Adapted from [crutcher/smot](https://github.com/crutcher/smot/).
+
+[^2]: If this file doesn't exist then `grind` will look for a "global" customization
+file to source instead, located in `${XDG_CONFIG_HOME}/grind.bash`, or in
+`${HOME}/.config/grind.bash` if `XDG_CONFIG_HOME` is unset.
 
 [alias]: https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_03_05.html
 [glow]: https://github.com/charmbracelet/glow
