@@ -17,6 +17,6 @@ fi
 
 echo -n "Checking bash scripts with shellcheck ... "
 cd "${REPO_ROOT_DIR}"
-TARGETS=( $(grovel_commands) $(grovel_files "*.bash") )
+TARGETS=($(grovel_commands) $(grovel_files "*.bash"))
 shellcheck -e SC2207 "${TARGETS[@]}"
 echo "OK"
