@@ -164,19 +164,19 @@ of scripts; so meta!
 The use-case for `.grind.bash` is project-level customization. You can also add
 user-level customizations to `${REPO_ROOT_DIR}/.grind.local.bash` [^2]. If user-level
 customizations are found, they will be _additionally_ applied after the project-level
-customizations. For example you can say `MARKDOWN_READER="glow -w 80" if you prefer
+customizations. For example you can say \`MARKDOWN_READER="glow -w 80" if you prefer
 narrower output, or swap out glow for some other markdown renderer.
 
 > :information_source: Add `/.grind.local.bash` to you `.gitignore` so this guy doesn't
 > get checked in to your repo by accident.
 
----
+______________________________________________________________________
 
 [^1]: Adapted from [crutcher/smot](https://github.com/crutcher/smot/).
 
-[^2]: If this file doesn't exist then `grind` will look for a "global" customization
-file to source instead, located in `${XDG_CONFIG_HOME}/grind.bash`, or in
-`${HOME}/.config/grind.bash` if `XDG_CONFIG_HOME` is unset.
+[^2]: If this file doesn't exist then `grind` will look for a "global" user customization
+    file to source instead, located in `${XDG_CONFIG_HOME}/grind.bash`, or in
+    `${HOME}/.config/grind.bash` if `XDG_CONFIG_HOME` is unset.
 
 [alias]: https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_03_05.html
 [glow]: https://github.com/charmbracelet/glow
