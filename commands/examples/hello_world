@@ -1,0 +1,10 @@
+#!/bin/bash
+set -eu -o pipefail
+docstring <<\EOF
+Prints `Hello, World!` to standard output.
+
+Does not accept any arguments.
+EOF
+(($#)) && bad_args "$@"
+
+echo "Hello, World!"

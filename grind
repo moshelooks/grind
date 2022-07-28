@@ -1,0 +1,171 @@
+#!/bin/bash
+# Adapted from <https://github.com/crutcher/smot>
+# See <https://github.com/moshelooks/grind> for docs.
+
+# Command completion; cf. <https://bit.ly/3zCGGB8>.
+_grind_complete() {
+    local repo_root_dir
+    # Bail if not in a git repo.
+    if ! repo_root_dir=$(git rev-parse --show-toplevel 2> /dev/null); then
+	return
+    fi
+
+    # If the first word is "help", skip it.
+    [ "${COMP_WORDS[1]}" != "help" ]; local start=$((1 + $?))
+    # Walk the command tree.
+    local end=$((COMP_CWORD - 1))
+    local cmd_path="${repo_root_dir}/commands"
+    for (( i=start ; i<=end; i++ )); do
+	cmd_path="${cmd_path}/${COMP_WORDS[i]}"
+	if [ ! -d "${cmd_path}" ]; then  # continue as long as cmd_path is a directory
+	    # If cmd_path is executable and the first word is not "help", enable the default
+	    # bash completion strategy (https://stackoverflow.com/a/19062943).
+	    if [[ -x "${cmd_path}" && $start -eq 1 ]]; then
+		compopt -o default
+	    fi
+	    return
+	fi
+    done
+
+    # Generate command completions for the current word from cmd_path.
+    local ws
+    ws=$( find "$cmd_path" -mindepth 1 -maxdepth 1 -executable -printf '%f\n' )
+    if [[ $COMP_CWORD -eq 1 ]]; then
+	ws=$ws$'\nhelp'
+    fi
+    COMPREPLY=( $( compgen -W "$ws" -- "${COMP_WORDS[COMP_CWORD]}" ) )
+}
+
+# When sourced, grind adds itself as an alias and sets up tab-completion.
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
+    # shellcheck disable=SC2139
+    alias grind="'$(realpath "${BASH_SOURCE[0]}")'"
+    complete -F _grind_complete grind
+    return
+fi
+
+set -eu -o pipefail
+
+# Environment variables and functions provided by grind for commands to utilize.
+
+# Where are we? Bail if not in a git repo.
+REPO_ROOT_DIR=$(git rev-parse --show-toplevel)
+export REPO_ROOT_DIR
+
+# If we want to re-invoke this target; where is it?
+GRIND="$(realpath "${BASH_SOURCE[0]}")"
+export GRIND
+
+function docstring() {
+    if [[ -v _GRIND_SHOW_DOCS_AND_EXIT ]]; then
+	$MARKDOWN_READER -
+	exit 0
+    fi
+}
+export -f docstring
+
+function bad_args() {
+    echo "grind: invalid argumments '$*'"
+    echo "Try 'grind ${_GRIND_HELP_COMMAND}' for more information."
+    exit 1
+}
+export -f bad_args
+
+# Load per-repo customizations.
+if [ -e "${REPO_ROOT_DIR}/.grind.bash" ]; then
+    # shellcheck disable=SC1091
+    source "${REPO_ROOT_DIR}/.grind.bash"
+fi
+
+# This goes _after_ per-repo customization so that the defaults can be overridden
+# without clobbering the user's preference if they set this in their environment.
+if [ ! -v MARKDOWN_READER ]; then
+  if command -v glow &> /dev/null; then
+    export MARKDOWN_READER="glow ${GLOW_ARGS:--w 93}"
+  else
+    export MARKDOWN_READER="cat"
+  fi
+fi
+
+_grind_describe_files() {
+    local type="$1"
+    local title="$2"
+    local findopts=( -mindepth 1 -maxdepth 1 -type "$type" -executable -printf "%f\n" )
+    local files=( $(find . "${findopts[@]}" | sort) )
+    if (( ${#files[@]} )); then
+	echo -e "\n# $title:\n"
+    fi
+    for file in "${files[@]}"; do
+	if [ "$type" == "d" ]; then
+	    local readme="$file/README.md"
+	else
+	    local readme="$file.md"
+	fi
+	local help=""
+	if [ -f "$readme" ]; then
+	    help=$(head -1 "$readme")
+	elif [ "$type" == "f" ]; then
+	    export _GRIND_SHOW_DOCS_AND_EXIT=1
+	    help="$(MARKDOWN_READER="cat" "$group_path/$file" --help | head -1)"
+	fi
+	local line="  * \`${file}\`"
+	[ -n "${help}" ] && line="$line - $help"
+	echo "$line"
+    done
+}
+
+_grind_group_help() {
+    local group_path="$1"
+    local group_title="$2"
+    (
+	set -eu -o pipefail
+	cd "$group_path"
+	cat
+	echo -e "# $group_title\n"
+
+	if [ -f README.md ]; then
+	    cat README.md  # Directory README
+	fi
+
+	_grind_describe_files "f" "Commands"
+	_grind_describe_files "d" "Groups"
+    ) | $MARKDOWN_READER -
+}
+
+main() {
+    if [[ -v 1 && "$1" =~ ^\-{0,2}help$ ]]; then
+	export _GRIND_SHOW_DOCS_AND_EXIT=1
+	shift
+    fi
+
+    local group_path="${REPO_ROOT_DIR}/commands"
+    local group_name=""
+    while true; do
+	if ! (($#)); then
+	    echo -n | _grind_group_help "${group_path}" "grind${group_name}"
+	    return $?
+	fi
+
+	local target="$1"
+	shift
+
+	if [ -d "${group_path}/${target}" ]; then
+	    group_path="${group_path}/${target}"
+	    group_name="${group_name} ${target}"
+	else
+	    break
+	fi
+    done
+
+    local cmd_path="${group_path}/${target}"
+    if [ -x "$cmd_path" ]; then
+	export _GRIND_HELP_COMMAND="help${group_name} ${target}"
+	exec "$cmd_path" "$@"
+    else
+	echo -e "*ERROR: No Such Command: $cmd_path*\n" \
+	    | _grind_group_help "$group_path" "grind${group_name}" 1>&2
+	return 1
+    fi
+}
+
+main "${@}"

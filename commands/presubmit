@@ -1,0 +1,22 @@
+#!/bin/bash
+set -eu -o pipefail
+docstring <<\EOF
+Checks for unstaged changes or untracked files, and runs shellcheck.
+
+The check for unstaged changes and untracked files may be skipped with
+`ALLOW_UNSTAGED=1` or by passing in `--allow-unstaged`.
+EOF
+
+if ! (($#)); then
+    if [ ! -v ALLOW_UNSTAGED ]; then
+	check_unstaged
+    fi
+elif ! [[ $# -eq 1 && $1 =~ ^\-{0,2}allow-unstaged$ ]]; then
+    bad_args "$@"
+fi
+
+echo -n "Checking bash scripts with shellcheck ... "
+cd "${REPO_ROOT_DIR}"
+TARGETS=( $(grovel_commands) $(grovel_files "*.bash") )
+shellcheck -e SC2207 "${TARGETS[@]}"
+echo "OK"
