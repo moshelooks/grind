@@ -147,7 +147,6 @@ of scripts; so meta!
 > for reading markdown but customize its output, use `GLOW_ARGS`; e.g. say
 > `GLOW_ARGS="-w 80"` for narrower output.
 
-
 [^1]: Adapted from https://github.com/crutcher/smot/.
 
 [alias]: https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_03_05.html
