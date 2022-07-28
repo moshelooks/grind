@@ -2,7 +2,7 @@
 
 Healthy projects under active development rapidly accumulate many small scripts to
 scratch various itches. The grind idiom [^1] is to organize these scripts into a tree of
-commands separated from rest of the codebase, that are all executed via single shell
+commands separated from rest of the codebase, that are all executed via single bash
 script ([`grind`](grind)).
 
 This approach has a number of advantages:
@@ -15,18 +15,28 @@ This approach has a number of advantages:
   monolithic Python application, it would need to import the dependencies of all of its
   sub-commands.
 
-## Getting Started
+## Prerequisites
 
-Clone the repo somewhere sane:
+It is recommended to install [glow] for rendering markdown. On Debian/Ubuntu:
 
 ```bash
-mkdir -p ~/git
-cd ~/git
-git clone https://github.com/moshelooks/grind.git
+echo 'deb [trusted=yes] https://repo.charm.sh/apt/ /' | sudo tee /etc/apt/sources.list.d/charm.list
+sudo apt update && sudo apt install glow
+```
+
+See [here](https://github.com/charmbracelet/glow#installation) for other installation
+options.
+
+## Getting Started
+
+Clone the repo somewhere sane e.g.:
+
+```bash
+git clone https://github.com/moshelooks/grind.git ~/git/grind/
 ```
 
 Sourcing the main script creates an [alias] so you can `grind` anywhere, and enables
-[tab completion]. This is not strictly necessary, but is recommended for ergonomics:
+[tab completion]. This is not strictly necessary but is recommended for ergonomics:
 
 ```bash
 echo 'source ~/git/grind/grind' >> ~/.bashrc
@@ -37,21 +47,30 @@ To see it in action:
 
 ```bash
 cd ~/git/grind
+# list top-level commands and groups
 grind
+# list commands and sub-groups in the 'examples' group
+grind examples
+# show help for the 'hello_world' command in the 'examples' group
+grind help examples hello_world
+# run it
+grind examples hello_world
 ```
 
 ## Under the Hood
 
-Consider `grind examples hello_world`:
+When `grind examples hello_world` is executed, `grind` goes up the directory tree
+starting from the current working directory to find the root of a git repository
+(`REPO_ROOT_DIR`), then runs `REPO_ROOT_DIR/commands/examples/hello_world`.
 
 - `examples` is the *group* corresponding to the directory [`commands/examples/`].
 - `hello_world` is the *command* corresponding the script
   [`commands/examples/hello_world`].
 
 There is only one group in this example, but groups may be nested arbitrarily inside of
-other groups; `grind arg1 arg2 arg3 ... argN` walks down the tree at [`commands/`] until
-it reaches an executable script `commands/arg1/.../argM` which gets run with
-`argM+1 argM+2 ... argN` as its arguments.
+other groups; `grind arg1 arg2 arg3 ... argN` walks down the directory tree from
+`REPO_ROOT_DIR/commands/` until it reaches an executable script `arg1/.../argM` ($M
+\\leq N$) which gets run with `argM+1 argM+2 ... argN` as its arguments.
 
 ## Using Grind in Your Project
 
@@ -65,9 +84,9 @@ expect the following environment variables to be set:
 
 - `REPO_ROOT_DIR` - absolute path to the root of their repository.
 - `GRIND` - absolute path to the `grind` script itself.
-- `MARKDOWN_READER` - a program that reads markdown from standard in and renders it to
-  standard out. This defaults to `glow -w 93` if [glow] is installed, falling back to
-  `cat` if `glow` is not found.
+- `MARKDOWN_READER` - a shell command that reads markdown from standard in and renders
+  it to standard out. The default is `glow -w 93` if [glow] is installed, falling back
+  to `cat` if `glow` is not found.
 
 The following bash functions are also available for commands to utilize:
 
@@ -89,8 +108,8 @@ EOF
 echo "Hello, World!"
 ```
 
-The call to the `docstring` function uses a [here document] with an escaped limit string
-so that the docstring can contain arbitrary control characters.
+The `docstring` function call uses a [here document] with an escaped limit string so
+that the docstring can contain arbitrary control characters.
 
 > :information_source: If your command is anything other than a bash script then you
 > must add a `cmd.md` file documenting the command in the same directory as your
@@ -129,7 +148,8 @@ shellcheck -e SC2207 "${TARGETS[@]}"
 echo "OK"
 ```
 
-This makes use of a number of functions defined in `.grind.bash`:
+This makes use of a number of functions defined in `grind`'s own
+[`.grind.bash`](.grind.bash) file:
 
 - `check_unstaged` - prints information about unstaged changes and untracked files, and
   exits with status 1 if any are found.
@@ -147,7 +167,7 @@ of scripts; so meta!
 > for reading markdown but customize its output, use `GLOW_ARGS`; e.g. say
 > `GLOW_ARGS="-w 80"` for narrower output.
 
-[^1]: Adapted from https://github.com/crutcher/smot/.
+[^1]: Adapted from [crutcher/smot](https://github.com/crutcher/smot/).
 
 [alias]: https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_03_05.html
 [glow]: https://github.com/charmbracelet/glow
@@ -155,4 +175,3 @@ of scripts; so meta!
 [tab completion]: https://en.wikipedia.org/wiki/Command-line_completion
 [`commands/examples/hello_world`]: commands/examples/hello_world
 [`commands/examples/`]: commands/examples/
-[`commands/`]: commands/
