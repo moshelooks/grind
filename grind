@@ -98,7 +98,7 @@ elif [ -v XDG_CONFIG_HOME ]; then
         source "${XDG_CONFIG_HOME}/grind.bash"
     fi
 elif [ -v HOME ]; then
-    if [ -e "${HOME}/grind.bash" ]; then
+    if [ -e "${HOME}/.config/grind.bash" ]; then
         # shellcheck disable=SC1091
         source "${HOME}/.config/grind.bash"
     fi
