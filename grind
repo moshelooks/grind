@@ -64,7 +64,7 @@ else
     export MARKDOWN_READER="cat"
 fi
 
-function docstring() {
+docstring() {
     if [[ -v _GRIND_SHOW_DOCS_AND_EXIT ]]; then
         $MARKDOWN_READER -
         exit 0
@@ -72,9 +72,13 @@ function docstring() {
 }
 export -f docstring
 
-function bad_args() {
-    echo "grind: invalid argumments '$*'"
-    echo "Try 'grind ${_GRIND_HELP_COMMAND}' for more information."
+bad_args() {
+    if (($#)); then
+	echo "grind: invalid argumments '$*'" 1>&2
+    else
+	echo "grind: missing arguments" 1>&2
+    fi
+    echo "Try 'grind ${_GRIND_HELP_COMMAND}' for more information." 1>&2
     exit 1
 }
 export -f bad_args

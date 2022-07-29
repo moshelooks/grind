@@ -1,16 +1,16 @@
 # The custom command execution environment for grind itself.
 
-function grovel_commands() {
+grovel_commands() {
     find "${REPO_ROOT_DIR}/commands" -type f -executable "$@"
 }
 export -f grovel_commands
 
-function grovel_files() {
+grovel_files() {
     git ls-files -oc --exclude-standard "$@"
 }
 export -f grovel_files
 
-function check_unstaged() {
+check_unstaged() {
     echo -n "Checking for unstaged changes ... "
     local unstaged
     unstaged=$(git diff --name-only)
