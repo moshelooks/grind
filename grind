@@ -37,10 +37,9 @@ _grind_complete() {
     COMPREPLY=($(compgen -W "$ws" -- "${COMP_WORDS[COMP_CWORD]}"))
 }
 
-# When sourced, grind adds itself as an alias and sets up tab-completion.
+# When sourced, grind adds itself to PATH and sets up tab-completion.
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
-    # shellcheck disable=SC2139
-    alias grind="'$(realpath "${BASH_SOURCE[0]}")'"
+    export PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd):$PATH"
     complete -F _grind_complete grind
     return
 fi

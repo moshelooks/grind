@@ -36,7 +36,7 @@ Clone the repo somewhere sane e.g.:
 git clone https://github.com/moshelooks/grind.git ~/git/grind/
 ```
 
-Sourcing the main script creates an [alias] so you can `grind` anywhere, and enables
+Sourcing the main script updates [`PATH`] so you can `grind` anywhere, and enables
 [tab completion]. This is not strictly necessary but is recommended for ergonomics:
 
 ```bash
@@ -178,9 +178,9 @@ ______________________________________________________________________
     file to source instead, located in `${XDG_CONFIG_HOME}/grind.bash`, or in
     `${HOME}/.config/grind.bash` if `XDG_CONFIG_HOME` is unset.
 
-[alias]: https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_03_05.html
 [glow]: https://github.com/charmbracelet/glow
 [here document]: https://tldp.org/LDP/abs/html/here-docs.html
 [tab completion]: https://en.wikipedia.org/wiki/Command-line_completion
 [`commands/examples/hello_world`]: commands/examples/hello_world
 [`commands/examples/`]: commands/examples/
+[`path`]: https://en.wikipedia.org/wiki/PATH_(variable)
