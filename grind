@@ -74,9 +74,9 @@ export -f docstring
 
 bad_args() {
     if (($#)); then
-	echo "grind: invalid argumments '$*'" 1>&2
+        echo "grind: invalid argumments '$*'" 1>&2
     else
-	echo "grind: missing arguments" 1>&2
+        echo "grind: missing arguments" 1>&2
     fi
     echo "Try 'grind ${_GRIND_HELP_COMMAND}' for more information." 1>&2
     exit 1
@@ -93,9 +93,16 @@ fi
 if [ -e "${REPO_ROOT_DIR}/.grind.local.bash" ]; then
     # shellcheck disable=SC1091
     source "${REPO_ROOT_DIR}/.grind.local.bash"
-elif [ -e "${XDG_CONFIG_HOME:-$HOME/.config}/grind.bash" ]; then
-    # shellcheck disable=SC1091
-    source "${XDG_CONFIG_HOME:-$HOME/.config}/grind.bash"
+elif [ -v XDG_CONFIG_HOME ]; then
+    if [ -e "${XDG_CONFIG_HOME}/grind.bash" ]; then
+        # shellcheck disable=SC1091
+        source "${XDG_CONFIG_HOME}/grind.bash"
+    fi
+elif [ -v HOME ]; then
+    if [ -e "${HOME}/grind.bash" ]; then
+        # shellcheck disable=SC1091
+        source "${HOME}/.config/grind.bash"
+    fi
 fi
 
 _grind_describe_files() {

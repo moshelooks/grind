@@ -15,17 +15,17 @@ check_unstaged() {
     local unstaged
     unstaged=$(git diff --name-only)
     if [ -n "${unstaged}" ]; then
-	echo -e "\nERROR: Repository has unstaged changes.\n" 1>&2
-	git status
-	exit 1
+        echo -e "\nERROR: Repository has unstaged changes.\n" 1>&2
+        git status
+        exit 1
     fi
     echo -e -n "OK\nChecking for untracked files ... "
     local untracked
     untracked=$(git ls-files --others --exclude-standard)
     if [ -n "${untracked}" ]; then
-	echo -e "\nERROR: Repository has untracked files.\n" 1>&2
-	git status
-	exit 1
+        echo -e "\nERROR: Repository has untracked files.\n" 1>&2
+        git status
+        exit 1
     fi
     echo "OK"
 }
