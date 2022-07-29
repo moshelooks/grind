@@ -9,7 +9,7 @@ EOF
 
 if ! (($#)); then
     if [ ! -v ALLOW_UNSTAGED ]; then
-	check_unstaged
+        check_unstaged
     fi
 elif ! [[ $# -eq 1 && $1 =~ ^\-{0,2}allow-unstaged$ ]]; then
     bad_args "$@"
