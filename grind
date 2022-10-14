@@ -39,7 +39,8 @@ _grind_complete() {
 
 # When sourced, grind adds itself to PATH and sets up tab-completion.
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
-    export PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd):$PATH"
+    PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd):$PATH"
+    export PATH
     complete -F _grind_complete grind
     return
 fi
