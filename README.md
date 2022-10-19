@@ -21,7 +21,9 @@ This approach has a number of advantages:
 It is recommended to install [glow] for rendering markdown. On Debian/Ubuntu:
 
 ```bash
-echo 'deb [trusted=yes] https://repo.charm.sh/apt/ /' | sudo tee /etc/apt/sources.list.d/charm.list
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
 sudo apt update && sudo apt install glow
 ```
 
@@ -85,6 +87,9 @@ expect the following environment variables to be set:
 
 - `REPO_ROOT_DIR` - absolute path to the root of their repository.
 - `GRIND` - absolute path to the `grind` script itself.
+- `GRIND_CURRENT_COMMAND` - full name including group(s) of the command itself. For
+  example the script `commands/foo/bar/baz` will see `foo bar baz` as the current
+  command.
 - `MARKDOWN_READER` - a shell command that reads markdown from standard in and renders
   it to standard out. The default is `glow -w 93` if [glow] is installed, falling back
   to `cat` if `glow` is not found.
